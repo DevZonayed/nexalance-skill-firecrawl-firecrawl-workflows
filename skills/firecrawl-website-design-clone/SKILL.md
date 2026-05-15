@@ -31,14 +31,30 @@ Use the host agent's normal prompt or modal UI. Do not name a harness-specific q
 
 ## Firecrawl Collection Plan
 
-Use Firecrawl through the CLI or equivalent tool surface. Prefer one scrape of the supplied URL first.
+Use Firecrawl through the CLI or equivalent tool surface. Always start with two parallel scrapes of the supplied URL:
+
+1. The `branding` format for structured design tokens.
+2. A full-page screenshot for visual context.
+
+Example:
+
+```bash
+firecrawl scrape "https://example.com" --format branding -o ".firecrawl/example-branding.json" --pretty &
+firecrawl scrape "https://example.com" --full-page-screenshot -o ".firecrawl/example-screenshot.png" &
+wait
+```
+
+If the screenshot scrape returns a remote image URL (e.g. signed storage link) instead of a local file, download it to the same `.firecrawl/` path so `DESIGN.md` can reference a stable local asset.
+
+Use the structured `branding` output as the primary source for colors, typography, components, imagery, personality, and confidence notes. Use the screenshot as the primary visual reference for layout, hierarchy, and overall feel. Add supplemental formats only when these two are insufficient for the final artifact.
 
 Collect:
 
-- page markdown for headings, copy hierarchy, CTAs, navigation, and section order
-- metadata and links for brand, product, and page-purpose clues
-- screenshots or visual formats when the available Firecrawl surface supports them
-- HTML only when needed to infer classes, font names, CSS variables, or component structure
+- branding data for colors, typography, spacing, buttons, logos, imagery, personality, and confidence
+- a full-page screenshot saved locally in `.firecrawl/` so it can be embedded in `DESIGN.md`
+- page markdown for headings, copy hierarchy, CTAs, navigation, and section order when needed
+- metadata and links for brand, product, and page-purpose clues when needed
+- HTML only when the branding output and screenshot are insufficient to infer classes, font names, CSS variables, or component structure
 - related pages only when the user asks for a broader site system
 
 Do not over-crawl by default. The first version should be useful from a single representative page.
@@ -66,7 +82,7 @@ Each parallel researcher should return source URLs, extracted evidence, inferred
 
 ## Final Deliverable
 
-Create or return a `DESIGN.md` with this structure:
+Create or return a `DESIGN.md` with this structure. Embed the full-page screenshot near the top so a coding agent gets visual context alongside the tokens.
 
 ```markdown
 # DESIGN.md: [Source Site]
@@ -75,6 +91,11 @@ Create or return a `DESIGN.md` with this structure:
 - URL: [source URL]
 - Capture date: [date]
 - Evidence: [scrape/screenshot/html/links used]
+
+## Reference Screenshot
+![Full-page screenshot of [Source Site]](./.firecrawl/[source]-screenshot.png)
+
+Use this screenshot as the visual source of truth for layout, hierarchy, density, and feel. Tokens below describe the same page in machine-readable form.
 
 ## Design Summary
 [Short description of the visual language and what an agent should recreate]

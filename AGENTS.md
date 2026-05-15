@@ -36,7 +36,7 @@ Plugin metadata and top-level docs are also safe to edit:
 
 Use this repo when an agent should produce a real deliverable with Firecrawl, such as:
 
-- website design clone briefs
+- website design-system extraction
 - recurring market scans
 - SEO audits
 - QA reports
