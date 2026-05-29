@@ -33,28 +33,31 @@ Use the host agent's normal prompt or modal UI. Do not name a harness-specific q
 
 Use Firecrawl through the CLI or equivalent tool surface. Always start with two parallel scrapes of the supplied URL:
 
-1. The `branding` format for structured design tokens.
+1. The `branding` and `images` formats together for structured design tokens and the full set of page images.
 2. A full-page screenshot for visual context.
 
 Example:
 
 ```bash
-firecrawl scrape "https://example.com" --format branding -o ".firecrawl/example-branding.json" --pretty &
+firecrawl scrape "https://example.com" --format branding,images -o ".firecrawl/example-branding.json" --pretty &
 firecrawl scrape "https://example.com" --full-page-screenshot -o ".firecrawl/example-screenshot.png" &
 wait
 ```
 
+Combining `branding` and `images` in one call still costs a single credit and is required: the `branding` block only surfaces curated brand assets (`logo`, `favicon`, `ogImage`, `logoHref`), so without `images` the agent will miss the page's actual content imagery (heroes, product shots, carousel slides, feature visuals, illustrations, accessory photos, end-of-page artwork, and similar). On a product page like `tesla.com/cybertruck` the `branding` block has no hero — only `images` returns the main Cybertruck hero (e.g. `Cybertruck-Hero-Desktop-NA-SA-APAC.png`) and the rest of the page's photography.
+
 If the screenshot scrape returns a remote image URL (e.g. signed storage link) instead of a local file, download it to the same `.firecrawl/` path so `DESIGN.md` can reference a stable local asset.
 
-Use the structured `branding` output as the primary source for colors, typography, components, imagery, personality, and confidence notes. Use the screenshot as the primary visual reference for layout, hierarchy, and overall feel. Add supplemental formats only when these two are insufficient for the final artifact.
+Use the structured `branding` output as the primary source for colors, typography, components, brand assets (logo, favicon, ogImage), personality, and confidence notes. Use the `images` list as the source of truth for the page's content imagery — hero photography, product shots, carousels, feature visuals, illustrations, and decorative graphics. Use the screenshot as the primary visual reference for layout, hierarchy, and overall feel. Add supplemental formats only when these are insufficient for the final artifact.
 
 Collect:
 
-- branding data for colors, typography, spacing, buttons, logos, imagery, personality, and confidence
+- branding data for colors, typography, spacing, buttons, logos, brand imagery, personality, and confidence
+- the full `images` list for hero, product, feature, and section imagery beyond the curated brand assets
 - a full-page screenshot saved locally in `.firecrawl/` so it can be embedded in `DESIGN.md`
 - page markdown for headings, copy hierarchy, CTAs, navigation, and section order when needed
 - metadata and links for brand, product, and page-purpose clues when needed
-- HTML only when the branding output and screenshot are insufficient to infer classes, font names, CSS variables, or component structure
+- HTML only when the branding output, images list, and screenshot are insufficient to infer classes, font names, CSS variables, or component structure
 - related pages only when the user asks for a broader site system
 
 Do not over-crawl by default. The first version should be useful from a single representative page.
@@ -68,7 +71,7 @@ Infer and document the site's design language:
 - spacing: container widths, section rhythm, grid gaps, padding scale, density
 - layout: page structure, hero patterns, cards, grids, nav, footer, responsive assumptions
 - components: buttons, inputs, cards, badges, nav items, pricing blocks, testimonials, feature rows, forms
-- imagery and icons: style, shape language, illustration/photo treatment, logo constraints
+- imagery and icons: style, shape language, illustration/photo treatment, logo constraints; pull representative hero, product, feature, and section images from the full `images` list rather than relying on `branding.images`, which only carries `logo`, `favicon`, `ogImage`, and `logoHref`
 - motion and interaction: hover states, transitions, animation style when observable or inferable
 - voice and content patterns: CTA wording, heading style, product copy rhythm
 
